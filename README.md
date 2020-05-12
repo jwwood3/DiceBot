@@ -9,7 +9,7 @@ Adds up the sum of the results and modifiers
 
 Alternate random distributions:
 true - pseudorandom results, all with equal weight
-fun - Chooses two players, one gets 20% chance for max value, the other gets 20% for min value
+fun - Chooses two players, one gets 20% chance for max value, the other gets 20% for min value. Die types lower than 6 are unaffected.
 
 
 
