@@ -1,5 +1,6 @@
 import discord
 import random
+import botAuth
 
 bot = discord.Client()
 
@@ -180,4 +181,4 @@ async def on_message(message):
                     if args[1].isdigit():
                         dieKind = int(args[1])
             await message.channel.send(roll_die(message.author, numDie, dieKind, bestSelector, additive))
-bot.run("NzA3NDEzOTIwNTc4NTM1NDk1.XrIcrw.MciPcLVtRwe6hYHSSk905U2kJLM")
+bot.run(botAuth.token)
