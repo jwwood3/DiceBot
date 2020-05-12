@@ -42,8 +42,10 @@ def roll_die(user, num, die, best, add):
         if distribution=="true":
             value = random.randint(1, die)
         elif distribution=="fun":
-            crit = random.randint(1,10)>8
-            #print(user.name + " | " + luckyGuy + " Crit = " + str(crit))
+            critmin = 0.8*die
+            critcheck = random.randint(1,die)
+            crit = critcheck>critmin
+            print(user.name + " | " + luckyGuy + " Crit = " + str(critcheck) + "/" + str(critmin) + " : " + str(crit))
             if user.name==luckyGuy:
                 if crit:
                     value = die
