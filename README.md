@@ -1,0 +1,2 @@
+# DiceBot
+Dnd discord bot
