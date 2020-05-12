@@ -1,2 +1,2 @@
 # DiceBot
-Dnd discord bot
+Dnd discord bot for dice rolls
