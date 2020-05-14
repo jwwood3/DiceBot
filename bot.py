@@ -95,6 +95,14 @@ def roll_die(user, num, die, best, add):
     sum+=add
     retString+=str(sum)
     return retString
+    
+def value_test(die):
+    results = [0]*die
+    for i in range(100000):
+        value = max([random.randint(1,die),random.choice([1,1,1,1,die])])
+        results[value-1]+=1
+    return results
+
 @bot.event
 async def on_message(message):
     global distribution
@@ -123,6 +131,9 @@ async def on_message(message):
             print("luck = " + luckyGuy + " unluck = " + unluckyGuy + " dist = " + distribution)
         elif cmd=="exit" and is_dm:
             await logout()
+        elif cmd.startswith("checkrng") and is_dm:
+            results = value_test(int(cmd.split(" ")[1]))
+            await message.channel.send(str(results))
         elif cmd.startswith("dm") and is_dm:
             cmds = cmd.split(" ")
             for role in bot.guilds[0].roles:
