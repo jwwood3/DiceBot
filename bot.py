@@ -43,9 +43,7 @@ def roll_die(user, num, die, best, add):
             value = random.randint(1, die)
         elif distribution=="fun":
             if user.name==luckyGuy:
-                critArray = [random.randint(1,die),random.choice([1,1,1,1,die])]
-                print(critArray)
-                value = max(critArray)
+                value = random.choices(range(1,die+1),weights=([1]*(die-1))+[1.2], k=1)[0]
             elif user.name==unluckyGuy:
                 critArray = [random.randint(1, die), random.choice([die, die, die, die, 1])]
                 print(critArray)
@@ -95,6 +93,15 @@ def roll_die(user, num, die, best, add):
     sum+=add
     retString+=str(sum)
     return retString
+    
+def value_test(die):
+    results = [0]*die
+    for i in range(100000):
+        value = random.choices(range(1,die+1),weights=([1]*(die-1))+[1.2], k=1)[0]
+        results[value-1]+=1
+    return results
+
+
 @bot.event
 async def on_message(message):
     global distribution
@@ -123,6 +130,9 @@ async def on_message(message):
             print("luck = " + luckyGuy + " unluck = " + unluckyGuy + " dist = " + distribution)
         elif cmd=="exit" and is_dm:
             await logout()
+        elif cmd.startswith("checkrng") and is_dm:
+            results = value_test(int(cmd.split(" ")[1]))
+            await message.channel.send(str(results))
         elif cmd.startswith("dm") and is_dm:
             cmds = cmd.split(" ")
             for role in bot.guilds[0].roles:
