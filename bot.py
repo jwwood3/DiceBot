@@ -42,20 +42,14 @@ def roll_die(user, num, die, best, add):
         if distribution=="true":
             value = random.randint(1, die)
         elif distribution=="fun":
-            critmin = 0.8*die
-            critcheck = random.randint(1,die)
-            crit = critcheck>critmin
-            print(user.name + " | " + luckyGuy + " Crit = " + str(critcheck) + "/" + str(critmin) + " : " + str(crit))
             if user.name==luckyGuy:
-                if crit:
-                    value = die
-                else:
-                    value = random.randint(1, (die-1))
+                critArray = [random.randint(1,die),random.choice([1,1,1,1,die])]
+                print(critArray)
+                value = max(critArray)
             elif user.name==unluckyGuy:
-                if crit:
-                    value = 1
-                else:
-                    value = random.randint(2, die)
+                critArray = [random.randint(1, die), random.choice([die, die, die, die, 1])]
+                print(critArray)
+                value = min(critArray)
             else:
                 value = random.randint(1, die)
         if user.name in fixes and fixes[user.name]<=die:
