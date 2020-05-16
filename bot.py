@@ -15,7 +15,7 @@ async def on_ready():
     global unluckyGuy
     players = []
     for i in bot.guilds[0].members:
-        #print(str(i) + " : " + str(i.bot) + " : " + str(i.status) + " : " + str(i.name))
+        print(str(i) + " : " + str(i.bot) + " : " + str(i.status) + " : " + str(i.name) + ":" + str(i.discriminator))
         is_dm = False
         for role in i.roles:
             if role.guild==bot.guilds[0] and role.name == "DM":
@@ -114,9 +114,10 @@ async def on_message(message):
     elif message.content[0:1] == '!' or message.content[0:1] == '/':
         cmd = message.content[1:].lower()
     is_dm = False
-    for role in message.author.roles:
-        if role.guild==bot.guilds[0] and role.name == "DM":
-            is_dm = True
+    if isinstance(message.author, discord.Member):
+        for role in message.author.roles:
+            if role.guild==bot.guilds[0] and role.name == "DM":
+                is_dm = True
     if cmd!="":
         if cmd=="true" and is_dm:
             distribution = "true"
@@ -124,8 +125,9 @@ async def on_message(message):
             distribution = "fun"
         elif cmd=="check" and is_dm:
             print("luck = " + luckyGuy + " unluck = " + unluckyGuy + " dist = " + distribution)
-        elif cmd=="exit" and is_dm:
-            await logout()
+        elif cmd=="exit" and message.author.name=="jackson" and message.author.discriminator=="0941":
+            await bot.logout()
+            #exit()
         elif cmd.startswith("checkrng") and is_dm:
             results = value_test(int(cmd.split(" ")[1]))
             await message.channel.send(str(results))
