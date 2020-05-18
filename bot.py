@@ -11,6 +11,9 @@ fixes = {}
 
 @bot.event
 async def on_ready():
+    setLucks()
+    
+def setLucks():
     global luckyGuy
     global unluckyGuy
     players = []
@@ -30,6 +33,7 @@ async def on_ready():
         unluckyGuy = random.choice(players)
     print("luck : "+luckyGuy)
     print("unluck : "+unluckyGuy)
+
 def roll_die(user, num, die, best, add):
     global luckyGuy
     global unluckyGuy
@@ -113,6 +117,8 @@ async def on_message(message):
         cmd = message.content[2:].lower()
     elif message.content[0:1] == '!' or message.content[0:1] == '/':
         cmd = message.content[1:].lower()
+    
+    is_owner = message.author.name=="jackson" and message.author.discriminator=="0941"
     is_dm = False
     if isinstance(message.author, discord.Member):
         for role in message.author.roles:
@@ -125,9 +131,11 @@ async def on_message(message):
             distribution = "fun"
         elif cmd=="check" and is_dm:
             print("luck = " + luckyGuy + " unluck = " + unluckyGuy + " dist = " + distribution)
-        elif cmd=="exit" and message.author.name=="jackson" and message.author.discriminator=="0941":
+        elif cmd=="exit" and is_owner:
             await bot.logout()
             #exit()
+        elif cmd=="restartfun" and (is_owner or is_dm):
+            setLucks()
         elif cmd.startswith("checkrng") and is_dm:
             results = value_test(int(cmd.split(" ")[1]))
             await message.channel.send(str(results))
