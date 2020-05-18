@@ -18,7 +18,7 @@ def setLucks():
     global unluckyGuy
     players = []
     for i in bot.guilds[0].members:
-        print(str(i) + " : " + str(i.bot) + " : " + str(i.status) + " : " + str(i.name) + ":" + str(i.discriminator))
+        #print(str(i) + " : " + str(i.bot) + " : " + str(i.status) + " : " + str(i.name) + ":" + str(i.discriminator))
         is_dm = False
         for role in i.roles:
             if role.guild==bot.guilds[0] and role.name == "DM":
@@ -96,11 +96,11 @@ def roll_die(user, num, die, best, add):
     retString+=str(sum)
     return retString
     
-def helpText(is_dm, is_owner):
+def helpText(permis):
     retString="Commands may/must be prefixed by /, //, !, or !!\n\n"+\
     "Normal Commands:\n"+\
     "help - Shows this help message\n\n"
-    if is_dm or is_owner:
+    if permis<2:
         retString+="DM Commands:\n"+\
         "true - Sets rolls to follow true random distribution\n"+\
         "fun - Sets rolls to follow fun distribution\n"+\
@@ -108,7 +108,7 @@ def helpText(is_dm, is_owner):
         "checkrng [num] - Rolls 100000 d[num]s and displays results using current distribution\n"+\
         "fixnext [player] [num] - Guarantees [player]'s next roll to be a [num] if possible\n"+\
         "restartfun - Picks new players to be affected by the fun distribution\n\n"
-    if is_owner:
+    if permis==0:
         retString+="Owner Commands:\n"+\
         "exit - Turns off the bot\n\n"
     retString+="Rolls:\n"+\
@@ -145,36 +145,45 @@ async def on_message(message):
         cmd = message.content[2:].lower()
     elif message.content[0:1] == '!' or message.content[0:1] == '/':
         cmd = message.content[1:].lower()
-    
-    is_owner = message.author.name=="jackson" and message.author.discriminator=="0941"
     is_dm = False
+    is_player = False
     if isinstance(message.author, discord.Member):
         for role in message.author.roles:
             if role.guild==bot.guilds[0] and role.name == "DM":
                 is_dm = True
+            elif role.guild==bot.guilds[0] and role.name == "Player":
+                is_player = True
+    if message.author.name=="jackson" and message.author.discriminator=="0941":
+        permis = 0
+    elif is_dm:
+        permis = 1
+    elif is_player:
+        permis = 2
+    else:
+        permis = 3
     if cmd!="":
-        if cmd=="true" and (is_dm or is_owner):
+        if cmd=="true" and permis<2:
             distribution = "true"
             await message.channel.send("distribution = true")
-        elif cmd=="fun" and (is_dm or is_owner):
+        elif cmd=="fun" and permis<2:
             distribution = "fun"
             await message.channel.send("distribution = fun")
-        elif cmd=="check" and (is_dm or is_owner):
+        elif cmd=="check" and permis<2:
             await message.channel.send("luck = " + luckyGuy + "\nunluck = " + unluckyGuy + "\ndist = " + distribution)
-        elif cmd=="exit" and is_owner:
+        elif cmd=="exit" and permis==0:
             await bot.logout()
             #exit()
         elif cmd=="help":
             if isinstance(message.channel, discord.DMChannel) or message.channel.name=="dm_stuff":
-                await message.channel.send(helpText(is_dm,is_owner))
+                await message.channel.send(helpText(permis))
             else:
-                await message.channel.send(helpText(False,False))
-        elif cmd=="restartfun" and (is_owner or is_dm):
+                await message.channel.send(helpText(2))
+        elif cmd=="restartfun" and permis<2:
             setLucks()
-        elif cmd.startswith("checkrng") and (is_dm or is_owner):
+        elif cmd.startswith("checkrng") and permis<2:
             results = value_test(int(cmd.split(" ")[1]))
             await message.channel.send(str(results))
-        elif cmd.startswith("fixnext") and (is_dm or is_owner):
+        elif cmd.startswith("fixnext") and permis<2:
             cmds = cmd.split(" ")
             fixes[cmds[1]]=int(cmds[2])
         else:
