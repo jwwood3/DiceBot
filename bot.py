@@ -96,10 +96,38 @@ def roll_die(user, num, die, best, add):
     retString+=str(sum)
     return retString
     
+def helpText(is_dm, is_owner):
+    retString="Commands may/must be prefixed by /, //, !, or !!\n\n"+\
+    "Normal Commands:\n"+\
+    "help - Shows this help message\n\n"
+    if is_dm or is_owner:
+        retString+="DM Commands:\n"+\
+        "true - Sets rolls to follow true random distribution\n"+\
+        "fun - Sets rolls to follow fun distribution\n"+\
+        "check - Shows which players are affected by fun distribution\n"+\
+        "checkrng [num] - Rolls 100000 d[num]s and displays results using current distribution\n"+\
+        "fixnext [player] [num] - Guarantees [player]'s next roll to be a [num] if possible\n"+\
+        "restartfun - Picks new players to be affected by the fun distribution\n\n"
+    if is_owner:
+        retString+="Owner Commands:\n"+\
+        "exit - Turns off the bot\n\n"
+    retString+="Rolls:\n"+\
+    "(num)d[dieType](b[bestNum])(+[modifier]) - Rolls (num), defaults to 1, [dieType] sided dice.\n"+\
+    "Optionally, you may add the best of and modifier sections.\n"+\
+    "b[bestNum] takes the best [bestNum] results from the rolled dice assuming [bestNum]<=(num).\n"+\
+    "+[modifier] adds the given [modifier] value to the roll's sum."
+    return retString
+    
 def value_test(die):
+    global distribution
     results = [0]*die
     for i in range(100000):
-        value = random.choices(range(1,die+1),weights=([1]*(die-1))+[1.2], k=1)[0]
+        if distribution=="true":
+            value = random.randint(1,die)
+        elif distribution=="fun":
+            value = random.choices(range(1,die+1),weights=([1]*(die-1))+[1.2], k=1)[0]
+        else:
+            value = 1
         results[value-1]+=1
     return results
 @bot.event
@@ -125,32 +153,25 @@ async def on_message(message):
             if role.guild==bot.guilds[0] and role.name == "DM":
                 is_dm = True
     if cmd!="":
-        if cmd=="true" and is_dm:
+        if cmd=="true" and (is_dm or is_owner):
             distribution = "true"
-        elif cmd=="fun" and is_dm:
+            await message.channel.send("distribution = true")
+        elif cmd=="fun" and (is_dm or is_owner):
             distribution = "fun"
-        elif cmd=="check" and is_dm:
-            print("luck = " + luckyGuy + " unluck = " + unluckyGuy + " dist = " + distribution)
+            await message.channel.send("distribution = fun")
+        elif cmd=="check" and (is_dm or is_owner):
+            await message.channel.send("luck = " + luckyGuy + "\nunluck = " + unluckyGuy + "\ndist = " + distribution)
         elif cmd=="exit" and is_owner:
             await bot.logout()
             #exit()
+        elif cmd=="help":
+            await message.channel.send(helpText(is_dm,is_owner))
         elif cmd=="restartfun" and (is_owner or is_dm):
             setLucks()
-        elif cmd.startswith("checkrng") and is_dm:
+        elif cmd.startswith("checkrng") and (is_dm or is_owner):
             results = value_test(int(cmd.split(" ")[1]))
             await message.channel.send(str(results))
-        elif cmd.startswith("dm") and is_dm:
-            cmds = cmd.split(" ")
-            for role in bot.guilds[0].roles:
-                if role.name == "DM":
-                    for player in bot.guilds[0].members:
-                        print(player.display_name)
-                        print(cmds[1])
-                        if player.display_name.lower()==cmds[1]:
-                            print("DM'D")
-                            await player.add_roles(role)
-                            
-        elif cmd.startswith("fixnext") and is_dm:
+        elif cmd.startswith("fixnext") and (is_dm or is_owner):
             cmds = cmd.split(" ")
             fixes[cmds[1]]=int(cmds[2])
         else:
