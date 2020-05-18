@@ -165,7 +165,10 @@ async def on_message(message):
             await bot.logout()
             #exit()
         elif cmd=="help":
-            await message.channel.send(helpText(is_dm,is_owner))
+            if isinstance(message.channel, discord.DMChannel) or message.channel.name=="dm_stuff":
+                await message.channel.send(helpText(is_dm,is_owner))
+            else:
+                await message.channel.send(helpText(False,False))
         elif cmd=="restartfun" and (is_owner or is_dm):
             setLucks()
         elif cmd.startswith("checkrng") and (is_dm or is_owner):
