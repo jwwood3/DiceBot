@@ -29,7 +29,7 @@ Owner Commands:
 exit - Turns off the bot
 
 Rolls:
-(num)d[dieType](b[bestNum])(+[modifier]) - Rolls (num), defaults to 1, [dieType] sided dice.
+(num)d\[dieType](b[bestNum])(+[modifier]) - Rolls (num), defaults to 1, [dieType] sided dice.
 Optionally, you may add the best of and modifier sections.
 b[bestNum] takes the best [bestNum] results from the rolled dice assuming [bestNum]<=(num).
 +[modifier] adds the given [modifier] value to the roll's sum. 
