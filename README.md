@@ -1,6 +1,11 @@
 # DiceBot
 DnD discord bot for dice rolls
 
+Keeps separate data for each server/direct message it's in
+Currently sorts by id numbers for the servers and channels.
+This may be a problem if theid of a dm channel could be the same as the id of a server
+
+
 Bot rolls dice allowing for:
 Any number of any type of die (all dice must be of the same type for one command)
 "best of" commands obtaining the best few results
